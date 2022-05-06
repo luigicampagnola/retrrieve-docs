@@ -1,0 +1,20 @@
+{
+  "name": "retrieve-docs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "watch": "nodemon src/server.js",
+    "start": "src/node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "docusign-esign": "^5.16.0",
+    "express": "^4.18.0",
+    "moment": "^2.29.3",
+    "nodemon": "^2.0.15"
+  }
+}
