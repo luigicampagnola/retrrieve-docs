@@ -1,17 +1,24 @@
 const docusign = require("docusign-esign");
 
-async function retrieveModel(args) {
+async function retrieveModel(...args) {
   let dsApiClient = new docusign.ApiClient();
-  dsApiClient.setBasePath(args.basePath);
-  dsApiClient.addDefaultHeader("Authorization", "Bearer " + args.accessToken);
+  dsApiClient.setBasePath(args[1]);
+  dsApiClient.addDefaultHeader("Authorization", "Bearer " + args[0]);
 
   let envelopesApi = new docusign.EnvelopesApi(dsApiClient),
     results = null;
 
+  //console.log(args[2]) // AccountId
+  //console.log(args[4]); // EnvelopeId
+  //console.log(args[5]) // Docs
+
+
+  //console.log(args)
+  //console.log(args.envelopeDocuments)
   return results = await envelopesApi.getDocument(
-    args.accountId,
-    args.envelopeId,
-    args.documentId, //combined or archived
+    args[2],
+    args[4],
+    args[3], //combined or archived
     {}
   );
 

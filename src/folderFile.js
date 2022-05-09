@@ -1,5 +1,5 @@
 const fs = require("fs");
-const folderName = "/Users/luigi.campagnola/documents/retrieve-docs/downloads/";
+const folderName = "/Users/luigi.campagnola/documents/retrieve-docs/retrrieve-docs/downloads/";
 const path = require("path");
 
 function createFolder() {

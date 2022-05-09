@@ -6,9 +6,6 @@ const { createFolder } = require("../src/folderFile");
 
 const { getFolderModel } = require("../models/folder.model");
 
-
-
-
 async function getEnvelopeId() {
   const results = await getFolderModel()
     .then((data) => data)
@@ -19,85 +16,90 @@ async function getEnvelopeId() {
   const envelopeIds = envelopes.map((envelope) => {
     return envelope.envelopeId;
   });
-
   //console.log(envelopeIds);
-  //res.send(envelopeIds)
   return envelopeIds;
 }
-
-
-
 
 async function retrieveMultipleController(req, res) {
   const envelopeIds = await getEnvelopeId().catch((error) =>
     console.log("error")
   );
-  console.log(envelopeIds)
-  for(let i = 0; i < envelopeIds.length; i++){
-    console.log("This")
+  console.log(envelopeIds);
+  for (let i = 0; i < envelopeIds.length; i++) {
+    console.log(envelopeIds);
   }
 }
 
-function logThis(){
-  console.log("This")
-}
-
-
-
-
+// ######### R E T R I E V E  C O N T R O L L E R
 
 async function retrieveController(req, res) {
-  //console.log(args.envelopeId)
-  //console.log(args.envelopeDocuments)
-  // if there are no more envelopeIds
-  // return undefinded
-  // else
-  // processFunction()
-  const listModelArray = [];
-  const getListModel = await listEnvelopes().catch((error) => "error");
-  listModelArray.push(getListModel);
-  //console.log(listModelArray);
-
-  const envelopeId = listModelArray.map((envelopeArray) => {
-    const id = envelopeArray.envelopeId;
-    return id;
-  });
-  //console.log(envelopeId);
-
-  const envelopeDocuments = listModelArray.map((envelope, i) => {
-    const envelopeDocus = envelope.envelopeDocuments;
-    return envelopeDocus;
-  });
-
   const accountId = await getUserInfoModel().catch((error) =>
     console.log(error)
   );
-
-  //console.log(accountId);
-
-  //console.log(envelopeDocuments[0]);
-
   const envelopeIds = await getEnvelopeId().catch((error) =>
     console.log(error)
   );
-  //console.log(envelopeIds);
+
+  /*   const listModelArray = []; */
+
+  //OLD DOCUS ENDPOING
+  /*   const getListModel = await listEnvelopes(accountId, envelopeIds).catch(
+    (error) => "error"
+  ); */
+  //console.log(getListModel)
+  /*   listModelArray.push(getListModel); */
+  //console.log(listModelArray);
+
+  const listDocuments = await Promise.all(
+    envelopeIds.map(async (envelope, i) => {
+      const getListModel = await listEnvelopes(accountId, envelopeIds[i]).catch(
+        (error) => "error getting List"
+      );
+      return getListModel.envelopeDocuments;
+    })
+  );
+
+  //console.log(listDocuments);
+
+  /*   const envelopeId = listModelArray.map((envelopeArray) => {
+    const id = envelopeArray.envelopeId;
+    return id;
+  }); */
+
+  /*   const envelopeDocuments = listModelArray.map((envelope, i) => {
+    const envelopeDocus = envelope.envelopeDocuments;
+    return envelopeDocus;
+  }); */
 
   const args = {
     accessToken: user.accessToken,
     basePath: user.basePath,
     accountId: accountId,
     documentId: "archive", //archive
-    envelopeId: envelopeId,
-    envelopeDocuments: envelopeDocuments,
+    envelopeId: envelopeIds, //envelopeIds
+    envelopeDocuments: listDocuments, //envelopeDocuments
   };
-
-  const results = await retrieveModel(args).catch((err) =>
-    console.log("error")
+  
+  const downloadResults = await Promise.all(
+    envelopeIds.map(async (envelope, i) => {
+      const results = await retrieveModel(
+        args.accessToken,
+        args.basePath,
+        args.accountId,
+        args.documentId,
+        args.envelopeId[i],
+        args.envelopeDocuments[i],
+      ).catch((error) => {
+        console.log("failed to download results");
+      });
+      return results;
+    })
   );
-  if (results) {
+
+  if (downloadResults) {
     createFolder();
   } else {
-    console.log("error");
+    console.log("error on create folder");
   }
   /*   if (results) {
     res.writeHead(200, {
@@ -107,10 +109,12 @@ async function retrieveController(req, res) {
     });
   }  */
   //console.log(results)
-  res.end(results, "binary");
+  //console.log(downloadResults)
+  res.end(downloadResults[0], "binary");
 }
 
 module.exports = {
   retrieveController,
   retrieveMultipleController,
+  getEnvelopeId,
 };

@@ -11,7 +11,6 @@ async function getUserInfoModel() {
 
 ;
     const accountId = account.accountIdGuid;
-    //console.log(accountId)
     return accountId
 }
 
