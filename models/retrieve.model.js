@@ -1,41 +1,44 @@
 const docusign = require("docusign-esign");
+const user = require("../data/data");
 
-async function retrieveModel(...args) {
+// R E T R I E V E  M O D E L
+async function retrieveModel(
+  accessToken,
+  basePath,
+  accountId,
+  documentId,
+  envelopeId
+) {
   let dsApiClient = new docusign.ApiClient();
-  dsApiClient.setBasePath(args[1]);
-  dsApiClient.addDefaultHeader("Authorization", "Bearer " + args[0]);
+  dsApiClient.setBasePath(basePath);
+  dsApiClient.addDefaultHeader("Authorization", "Bearer " + accessToken);
 
   let envelopesApi = new docusign.EnvelopesApi(dsApiClient),
     results = null;
 
-  //console.log(args[2]) // AccountId
-  //console.log(args[4]); // EnvelopeId
-  //console.log(args[5]) // Docs
-
-
-  //console.log(args)
-  //console.log(args.envelopeDocuments)
-  return results = await envelopesApi.getDocument(
-    args[2],
-    args[4],
-    args[3], //combined or archived
+  return (results = await envelopesApi.getDocument(
+    accountId,
+    envelopeId,
+    documentId, //combined or archived
     {}
-  );
-
-/*   const modelDoc = args.envelopeDocs.map((files)=>{
+  ));
+  console.log(results);
+  /*    const modelDoc = envelopeDocuments.map((files)=>{
     return files.documentId;
-
+  }) */
+  //console.log(documentId)
+  //console.log("model log", modelDoc);
+  /*   let docItem = envelopeDocuments.find(
     
-  })
-  console.log(args.documentId)
-  console.log("model log", modelDoc);
-  let docItem = args.envelopeDocuments.find(
-      (item) => item.documentId === args.documentId
+      (item) => {
+        console.log(item.documentId)
+        console.log(documentId)
+        item.documentId === documentId
+      }
     ),
     docName = docItem.name,
     hasPDFsuffix = docName.substr(docName.length - 4).toUpperCase() === ".PDF";
     
-
   pdfFile = hasPDFsuffix;
   if (
     (docItem.type === "content" || docItem.type === "summary") &&
@@ -48,7 +51,9 @@ async function retrieveModel(...args) {
   if (docItem.type === "zip") {
     docName += ".zip";
   }
-  console.log(pdfFile)
+  console.log("docItem", docItem.type)
+
+  //console.log(pdfFile)
   let mimetype;
   if (pdfFile) {
     mimetype = "application/pdf";
@@ -61,9 +66,28 @@ async function retrieveModel(...args) {
     mimetype: mimetype,
     docName: docName,
     fileBytes: results,
-  }; */
+  };  */
 }
 
+// R E T R I E V E  O N E  M O D E L
+async function retrieveOneModel(accountId, envelopeId) {
+  let dsApiClient = new docusign.ApiClient();
+  dsApiClient.setBasePath(user.basePath);
+  dsApiClient.addDefaultHeader("Authorization", "Bearer " + user.accessToken);
+
+  let envelopesApi = new docusign.EnvelopesApi(dsApiClient),
+    results = null;
+
+    console.log(accountId)
+    console.log(envelopeId)
+  return results = await envelopesApi.getDocument(
+    accountId,
+    envelopeId,
+    "archive", //combined or archived
+    {}
+  );
+}
 module.exports = {
   retrieveModel,
+  retrieveOneModel,
 };
