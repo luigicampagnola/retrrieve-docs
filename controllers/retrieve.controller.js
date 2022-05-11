@@ -1,3 +1,4 @@
+const { Readable } = require("stream");
 const { retrieveModel } = require("../models/retrieve.model");
 const user = require("../data/data");
 const { listEnvelopes } = require("../models/list.model");
@@ -6,6 +7,10 @@ const { createFolder } = require("../src/folderFile");
 const { retrieveOneModel } = require("../models/retrieve.model");
 const { listOneEnvelopes } = require("../models/list.model");
 const { getFolderModel } = require("../models/folder.model");
+
+const fs = require("fs");
+const events = require("events");
+const eventEmitter = new events.EventEmitter();
 
 async function getEnvelopeId() {
   const results = await getFolderModel()
@@ -19,7 +24,6 @@ async function getEnvelopeId() {
   });
   return envelopeIds;
 }
-
 
 // ######### R E T R I E V E  C O N T R O L L E R
 
@@ -44,9 +48,9 @@ async function retrieveController(req, res) {
     accessToken: user.accessToken,
     basePath: user.basePath,
     accountId: accountId,
-    documentId: "archive", 
-    envelopeId: envelopeIds, 
-    envelopeDocuments: listDocuments, 
+    documentId: "archive",
+    envelopeId: envelopeIds,
+    envelopeDocuments: listDocuments,
   };
 
   const downloadResults = await Promise.all(
@@ -90,9 +94,8 @@ async function retrieveOneController(req, res) {
   const envelopeIdMap = await getEnvelopeId().catch((error) =>
     console.log(error)
   );
-  
-  const envelopeId = envelopeIdMap[1];
 
+  const envelopeId = envelopeIdMap[1];
 
   const getListModel = await listOneEnvelopes(accountId, envelopeId).catch(
     (error) => console.log("error getListModel")
@@ -104,14 +107,13 @@ async function retrieveOneController(req, res) {
     return envelopeDocus;
   });
 
-
   const args = {
     accessToken: user.accessToken,
     basePath: user.basePath,
     accountId: accountId,
-    documentId: "archive", 
-    envelopeId: envelopeId, 
-    envelopeDocuments: envelopeDocuments, 
+    documentId: "archive",
+    envelopeId: envelopeId,
+    envelopeDocuments: envelopeDocuments,
   };
 
   const results = await retrieveOneModel(accountId, envelopeId).catch((err) =>
@@ -123,13 +125,46 @@ async function retrieveOneController(req, res) {
   } else {
     console.log("error on create folder");
   }
-  
-  res.end(results, "binary");
+
+  return results;
 }
+
+async function resultsHandler(req, res) {
+  const data = await retrieveOneController().catch((err) => {
+    console.log("error getting results in resultHandler const data");
+  });
+  const buff = Buffer.from(data, "binary");
+  console.log(buff);
+
+  const readable = new Readable();
+  readable._read = () => {};
+  readable.push(buff, "binary");
+  readable.push(null);
+
+  console.log(readable);
+
+   let writable = fs.createWriteStream("test.pdf");
+
+  readable.pipe(writable);
+
+  /*
+  writer.on("data", function (chunk) {
+    buff += chunk;
+  });
+
+  writer.on("end", function () {
+    console.log(buff);
+  }); */
+
+  //console.log(buff.toString())
+  //console.log(data);
+}
+
+eventEmitter.on("results", resultsHandler);
+eventEmitter.emit("results");
 
 module.exports = {
   retrieveController,
   retrieveOneController,
-
   getEnvelopeId,
 };

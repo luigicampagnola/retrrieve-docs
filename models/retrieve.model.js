@@ -69,6 +69,8 @@ async function retrieveModel(
   };  */
 }
 
+
+
 // R E T R I E V E  O N E  M O D E L
 async function retrieveOneModel(accountId, envelopeId) {
   let dsApiClient = new docusign.ApiClient();
@@ -83,7 +85,7 @@ async function retrieveOneModel(accountId, envelopeId) {
   return results = await envelopesApi.getDocument(
     accountId,
     envelopeId,
-    "archive", //combined or archived
+    "combined", //combined or archived
     {}
   );
 }
