@@ -16,12 +16,15 @@ async function retrieveModel(
   let envelopesApi = new docusign.EnvelopesApi(dsApiClient),
     results = null;
 
-  return (results = await envelopesApi.getDocument(
+  
+  //console.log(accountId + " account IDs");
+  //console.log(envelopeId + " EnvelopeIds")
+  return results = await envelopesApi.getDocument(
     accountId,
     envelopeId,
-    documentId, //combined or archived
+    "combined", //combined or archived
     {}
-  ));
+  );
   console.log(results);
   /*    const modelDoc = envelopeDocuments.map((files)=>{
     return files.documentId;
@@ -80,8 +83,8 @@ async function retrieveOneModel(accountId, envelopeId) {
   let envelopesApi = new docusign.EnvelopesApi(dsApiClient),
     results = null;
 
-    console.log(accountId)
-    console.log(envelopeId)
+    //console.log(accountId)
+    //console.log(envelopeId)
   return results = await envelopesApi.getDocument(
     accountId,
     envelopeId,
