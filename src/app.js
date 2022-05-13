@@ -3,7 +3,6 @@ const app = express();
 const listRouter = require("../routes/list.router");
 const retrieveRouter = require("../routes/retrieve.router");
 const getFolderRouter = require("../routes/folder.router");
-const getEnvelopeIdRouter = require("../routes/envelopeId.router");
 const getUserInfoRouter = require("../routes/userInfo.router");
 const retrieveOneRouter = require('../routes/retrieve-one.router')
 app.use(express.json()); //convert every request to a js object

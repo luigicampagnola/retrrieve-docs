@@ -16,9 +16,7 @@ async function retrieveModel(
   let envelopesApi = new docusign.EnvelopesApi(dsApiClient),
     results = null;
 
-  
-  //console.log(accountId + " account IDs");
-  //console.log(envelopeId + " EnvelopeIds")
+ 
   return results = await envelopesApi.getDocument(
     accountId,
     envelopeId,

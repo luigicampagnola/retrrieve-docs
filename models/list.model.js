@@ -6,12 +6,6 @@ async function listEnvelopes(accountId, envelopeIds) {
   dsApiClient.setBasePath(user.basePath);
   dsApiClient.addDefaultHeader("Authorization", "Bearer " + user.accessToken);
 
-  //console.log(accountId);
-  //console.log(envelopeIds);
-
-  //console.log(envelopeIds)
-
-
 
   let envelopesApi = new docusign.EnvelopesApi(dsApiClient);
   let results = await envelopesApi.listDocuments(
@@ -29,8 +23,6 @@ async function listOneEnvelopes(accountId, envelopeId) {
   dsApiClient.setBasePath(user.basePath);
   dsApiClient.addDefaultHeader("Authorization", "Bearer " + user.accessToken);
 
-
-  //console.log(envelopeId)
 
   let envelopesApi = new docusign.EnvelopesApi(dsApiClient);
   let results = await envelopesApi.listDocuments(

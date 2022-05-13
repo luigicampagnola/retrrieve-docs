@@ -16,6 +16,25 @@ async function getFolderModel(args) {
   return results;
 }
 
+async function getRecipientsInfo (accountId, envelopeId){
+  let dsApiClient = new docusign.ApiClient();
+  dsApiClient.setBasePath(user.basePath);
+  dsApiClient.addDefaultHeader("Authorization", "Bearer " + user.accessToken);
+
+  let envelopesApi = new docusign.EnvelopesApi(dsApiClient);
+
+  results = await envelopesApi.listRecipients(
+    accountId,
+    envelopeId,
+    null
+  );
+
+  return results;
+}
+
+
 module.exports = {
   getFolderModel,
+  getRecipientsInfo,
 };
+
