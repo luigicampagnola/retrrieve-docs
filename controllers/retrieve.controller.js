@@ -56,7 +56,7 @@ async function getRecipientsDate() {
 
 
   const formatDateTime = delivereDateTime.map(date =>{
-    return date.slice(0, -8)
+    return date.slice(0, -9)
   })
   //console.log(formatDelivereDateTime);
   return formatDateTime;
