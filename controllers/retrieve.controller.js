@@ -1,20 +1,29 @@
 const user = require("../data/data");
 const { retrieveModel } = require("../models/retrieve.model");
 const { listEnvelopes } = require("../models/list.model");
-const { getUserInfoModel } = require("../models/userInfo.model");
+const {
+  getUserInfoModel,
+  getUserNameModel,
+} = require("../models/userInfo.model");
 const { createFolderDownload, createNameFolder } = require("../src/folderFile");
 const { retrieveOneModel } = require("../models/retrieve.model");
 const { listOneEnvelopes } = require("../models/list.model");
-const { getFolderModel, getRecipientsInfo } = require("../models/folder.model");
+const {
+  getFolderModel,
+  getRecipientsInfoModel,
+} = require("../models/folder.model");
 
 const { Readable } = require("stream");
 const fs = require("fs");
 const events = require("events");
+const path = require("path")
 
 const eventEmitter = new events.EventEmitter();
 
 // <-----------------------------------------------------------> //
 // ######### E N V E L O P E  I D
+
+
 
 async function getEnvelopeId() {
   const results = await getFolderModel()
@@ -29,6 +38,10 @@ async function getEnvelopeId() {
   return envelopeIds;
 }
 
+// <-----------------------------------------------------------> //
+// ######## R E T R I E V E  U S E R  D A T E  A N D  N A M E
+
+// G E T  D A T E
 async function getRecipientsDate() {
   const envelopeIdPromise = await getEnvelopeId().catch((error) =>
     console.log("error on envelopeIdPromise resultsHandler")
@@ -38,9 +51,11 @@ async function getRecipientsDate() {
     console.log("error on promise accountId retrieveController")
   );
 
+  const envelopeId = envelopeIdPromise[0];
+
   const listRecipientDates = await Promise.all(
     envelopeIdPromise.map(async (envelope, i) => {
-      const recipientDates = await getRecipientsInfo(
+      const recipientDates = await getRecipientsInfoModel(
         accountId,
         envelopeIdPromise[i]
       ).catch((err) => {
@@ -54,14 +69,13 @@ async function getRecipientsDate() {
     return recipient.signers[0].deliveredDateTime;
   });
 
-
-  const formatDateTime = delivereDateTime.map(date =>{
-    return date.slice(0, -9)
-  })
-  //console.log(formatDelivereDateTime);
+  const formatDateTime = delivereDateTime.map((date) => {
+    return date.slice(0, -9);
+  });
   return formatDateTime;
 }
 
+// G E T  N A M E
 async function getRecipientsNames() {
   const envelopeIdPromise = await getEnvelopeId().catch((error) =>
     console.log("error on envelopeIdPromise resultsHandler")
@@ -71,11 +85,9 @@ async function getRecipientsNames() {
     console.log("error on promise accountId retrieveController")
   );
 
-  //const envelopeId = envelopeIdPromise[1]
-
   const recipientNames = await Promise.all(
     envelopeIdPromise.map(async (envelope, i) => {
-      const recipientName = await getRecipientsInfo(
+      const recipientName = await getRecipientsInfoModel(
         accountId,
         envelopeIdPromise[i]
       ).catch((error) => {
@@ -85,35 +97,19 @@ async function getRecipientsNames() {
     })
   );
 
-  // Retrieve One Name
-  /*   const recipientEmail = await getRecipientInfo(accountId, envelopeId).catch(err=> console.log(err));
-
-  const recipientName = recipientEmail.signers.map(array =>{
-    return array.name
-  }) */
-
   const envelopeId = envelopeIdPromise[0]
-  const recNames = await getRecipientsInfo(accountId, envelopeId).catch(err =>{console.log("error on recNames")});
+  const recNames = await getRecipientsInfoModel(accountId, envelopeId).catch(
+    (err) => {
+      console.log("error on recNames");
+    }
+  );
 
-
-
-  //console.log(recNames)
   const mappingNames = recipientNames.map((recipient, i) => {
     return recipient.signers[0].name;
   });
 
-  //console.log(mappingNames[0][0].name);
-  //console.log(mappingNames);
-
-  //console.log(recipientEmails);
   return mappingNames;
 }
-
-
-
-
-
-
 
 // <-----------------------------------------------------------> //
 // ######### R E T R I E V E  O N E  C O N T R O L L E R
@@ -160,10 +156,6 @@ async function retrieveOneController(req, res) {
   return results;
 }
 
-
-
-
-
 // <-----------------------------------------------------------> //
 // ######### R E S U L T  O N E  H A N D L E R
 
@@ -206,8 +198,6 @@ async function resultsOneHandler() {
 
   readable.pipe(writable);
 }
-
-
 
 
 
@@ -269,7 +259,7 @@ async function retrieveController(req, res) {
 
   if (downloadResults) {
     //console.log(retrieveNames[0]);
-    createFolderDownload();
+    await createFolderDownload();
   } else {
     console.log("error on createfolder retrieveController");
   }
@@ -286,7 +276,6 @@ async function retrieveController(req, res) {
   return downloadResults;
 }
 
-
 // <-----------------------------------------------------------> //
 // ######### R E S U L T  H A N D L E R
 
@@ -297,20 +286,20 @@ async function resultsHandler() {
 
   const names = retrieveNames;
 
-  //console.log(names)
-  //createNameFolder(names);
-  const retrieveDates = await getRecipientsDate().catch(err=>{
+  const retrieveDates = await getRecipientsDate().catch((err) => {
     console.log("error oon retrieveDates resultsHandler");
-  })
+  });
 
   const dates = retrieveDates;
-
-  console.log(dates)
 
   const envelopeIdPromise = await getEnvelopeId().catch((error) =>
     console.log("error on envelopeIdPromise resultsHandler")
   );
-  let count = 1;
+
+  const accountName = await getUserNameModel().catch((error) => {
+    console.log("error on accountName retrieveContoller");
+  });
+
   const dataResult = await Promise.all(
     envelopeIdPromise.map(async (envelope, i) => {
       let data = await retrieveController().catch((err) => {
@@ -325,18 +314,20 @@ async function resultsHandler() {
       readable.push(null);
 
       //console.log(documentName);
-      let fileName = `/Users/luigi.campagnola/documents/retrieve-docs/retrrieve-docs/downloads/${names[i]}-${dates[i]}.pdf`;
+      let fileName = `/Users/luigi.campagnola/documents/retrieve-docs/retrrieve-docs/downloads/${accountName}/${names[i]}-${dates[i]}.pdf`;
       let writable = fs.createWriteStream(fileName);
 
-      console.log("<----------------------------->");
       readable.pipe(writable);
     })
   );
   return dataResult;
 }
 
-eventEmitter.on("results", resultsHandler);
-eventEmitter.emit("results");
+
+
+
+//eventEmitter.on("results", resultsHandler);
+//eventEmitter.emit("results");
 
 //eventEmitter.on("name", getRecipientsNames);
 //eventEmitter.emit("name");
@@ -348,4 +339,4 @@ module.exports = {
   retrieveController,
   retrieveOneController,
   getEnvelopeId,
-}
+};

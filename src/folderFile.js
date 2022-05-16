@@ -1,38 +1,26 @@
+const { getUserNameModel } = require("../models/userInfo.model");
 
 const fs = require("fs");
-const folder =
-  "/Users/luigi.campagnola/documents/retrieve-docs/retrrieve-docs/downloads/";
+
 const path = require("path");
 
-async function createFolderDownload(names) {
-/*    const retrieveRecipientNames = await getRecipientsNames().catch((error) =>
-    console.log("error retrieveRecipientNames on folderFile")
-  );
-  let accountName = retrieveRecipientNames[0];  
- */
-console.log(names)
-  if (!fs.existsSync(folder)) {
-    fs.mkdirSync(folder);
-  } else {
-    console.log("couldn't create a new folder");
-  }
-/* 
-  console.log(test);
- fs.mkdirSync(`${folder}/${accountName}`);  
- */
+async function createFolderDownload() {
+  const folderDownload = path.dirname(__dirname) + "/downloads/";
 
-  /*   fs.appendFile(`${folderName}/data.txt`, "Hey", (err) => {
-    if (err) throw err;
-    console.log("File modified and/or created!");
-  }); */
-  /*   let baseDir = path.join(__dirname);
-  console.log(baseDir); */
+  const accountName = await getUserNameModel().catch((error) => {
+    console.log("error on accountName retrieveContoller");
+  });
+
+  //console.log(__dirname)
+  const accountNameFolder = folderDownload + accountName;
+
+  //console.log(accountNameFolder);
+  if (!fs.existsSync(folderDownload)) {
+    fs.mkdirSync(folderDownload);
+  }
+  if (!fs.existsSync(accountNameFolder)) {
+    fs.mkdirSync(accountNameFolder)
+  } 
 }
 
-function createNameFolder(names){
-  if(names){
-    console.log(names)
-  }
-}
-
-module.exports = { createFolderDownload, createNameFolder };
+module.exports = { createFolderDownload };
