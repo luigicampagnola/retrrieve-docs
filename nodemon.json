@@ -1,6 +1,6 @@
 {
   "ignore": [
-    "/Users/luigi.campagnola/Documents/retrieve-docs/retrrieve-docs/api-data/userInfo.json",
-    "api-data"
+    "/Users/luigi.campagnola/Documents/retrieve-docs/retrrieve-docs/data/userInfo.json",
+    "data"
   ]
 }

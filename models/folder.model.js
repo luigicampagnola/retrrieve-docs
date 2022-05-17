@@ -2,7 +2,7 @@ const docusign = require("docusign-esign");
 const user  = require("../data/data");
 const moment = require("moment");
 
-async function getFolderModel(args) {
+async function getFolderModel(accountId) {
   let dsApiClient = new docusign.ApiClient();
   dsApiClient.setBasePath(user.basePath);
   dsApiClient.addDefaultHeader("Authorization", "Bearer " + user.accessToken);
@@ -12,7 +12,7 @@ async function getFolderModel(args) {
 
   let options = { fromDate: moment().subtract(30, "days").format() };
 
-  results = await envelopesApi.listStatusChanges(user.accountId, options)
+  results = await envelopesApi.listStatusChanges(accountId, options)
   return results;
 }
 

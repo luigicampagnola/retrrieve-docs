@@ -1,9 +1,9 @@
 const express = require("express")
-const { createFileSenderInfo } = require("../file-handlers/createFileEnvelopeId");
+const { writeFileEnvelopesInfo } = require("../file-handlers/readWriteAPI");
 
-const createFileEnvelopeIdRouter = express.Router();
+const writeFileEnvelopeInfoRouter = express.Router();
 
-createFileEnvelopeIdRouter.get("/", createFileSenderInfo);
+writeFileEnvelopeInfoRouter.get("/", writeFileEnvelopesInfo);
 
-module.exports = createFileEnvelopeIdRouter;
+module.exports = writeFileEnvelopeInfoRouter;
 
