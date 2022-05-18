@@ -1,4 +1,5 @@
 const docusign = require("docusign-esign");
+let count = 0;
 
 // R E T R I E V E  M O D E L
 async function retrieveModel(
@@ -15,6 +16,7 @@ async function retrieveModel(
   let envelopesApi = new docusign.EnvelopesApi(dsApiClient),
     results = null;
 
+    console.log("retrieveModel", count++)
   return results = await envelopesApi.getDocument(
     accountId,
     envelopeId,

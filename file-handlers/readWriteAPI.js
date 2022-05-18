@@ -5,6 +5,8 @@ const events = require("events");
 const path = require("path");
 const { getUserInfoModel } = require("../models/userInfo.model");
 
+
+
 const eventEmitter = new events.EventEmitter();
 
 const folderPath = path.dirname(__dirname) + "/data/";
