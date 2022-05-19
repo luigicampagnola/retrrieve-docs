@@ -42,6 +42,7 @@ async function retrieveController(i) {
     envelopeId: envelopeIds,
   };
 
+
   const downloadResults = await retrieveModel(
     args.accessToken,
     args.basePath,
@@ -72,7 +73,7 @@ async function retrieveController(i) {
     console.log("error on createfolder retrieveController");
   }
 
-  return downloadResults;
+  return downloadResults
 }
 
 // <-----------------------------------------------------------> //
@@ -120,7 +121,7 @@ async function resultsHandler() {
       readable._read = () => {};
       readable.push(buff, "binary");
       readable.push(null);
-
+      console.log(readable)
       //console.log(documentName);
       let fileName = `/Users/luigi.campagnola/documents/retrieve-docs/retrrieve-docs/downloads/${accountName}/${emailSubjects[i]}-${formatDateTime[i]}.pdf`;
       let writable = fs.createWriteStream(fileName);
@@ -129,7 +130,7 @@ async function resultsHandler() {
       readable.pipe(writable);
     })
   );
-  return dataResult;
+  return dataResult
 }
 
 eventEmitter.on("results", resultsHandler);

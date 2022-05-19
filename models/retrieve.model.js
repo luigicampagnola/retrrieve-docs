@@ -16,13 +16,14 @@ async function retrieveModel(
   let envelopesApi = new docusign.EnvelopesApi(dsApiClient),
     results = null;
 
-    console.log("retrieveModel", count++)
+
+    console.log(count++)
   return results = await envelopesApi.getDocument(
     accountId,
     envelopeId,
     "combined", //combined or archived
     {}
-  );
+  )
 }
 
 module.exports = {
